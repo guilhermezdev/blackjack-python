@@ -3,7 +3,7 @@ from typing import List
 
 from card import *
 
-class GameState:
+class BlackjackGame:
     def __init__(self):
         self.playing = True
         self.dealer_hand = []
@@ -72,6 +72,4 @@ class GameState:
         self.deal_card(self.dealer_hand)
         
         self.check_game_status()
-    
-
     
