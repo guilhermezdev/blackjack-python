@@ -8,6 +8,9 @@ from game_state_manager import *
 
 from button import *
 
+from assets import *
+from text import *
+
 class MainMenu:
     def __init__(self, screen: Surface, game_state_manager: GameStateManager):
         self.screen = screen
@@ -16,21 +19,21 @@ class MainMenu:
         
         self.game_state_manger = game_state_manager
         
+        self.play_button =  Button(self.width / 2, 160, 100, 50, 'PLAY')
+        
     def run(self):
         self.screen.fill(LIGHT_GREEN)
+        self.handle_events()
         
-        play_button = Button(self.width / 2, 160, 100, 50, 'PLAY')
-        play_button.draw(self.screen)
-
+        self.play_button.draw(self.screen)
+        Text('MAIN MENU').draw(self.screen, (self.width / 2, 80), pixel_font)
+        
+    def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if play_button.check_collision(event.pos):
+                if self.play_button.check_collision(event.pos):
                     self.game_state_manger.set_state('blackjack')
         
-        # draw title
-        text_surf = pixel_font.render('MAIN MENU', True, BLACK)
-        text_rect = text_surf.get_rect(center=(self.width / 2, 80))
-        self.screen.blit(text_surf, text_rect)

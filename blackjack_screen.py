@@ -8,6 +8,9 @@ from assets import *
 from blackjack_game import *
 from game_state_manager import *
 
+from button import *
+from text import *
+
 class BlackjackScreen:
     def __init__(self, screen: Surface, game_state_manager: GameStateManager ):
         self.screen = screen
@@ -20,89 +23,15 @@ class BlackjackScreen:
         self.game_state = BlackjackGame()
         self.game_state.new_game()
         
+        self.hit_button = Button(self.width - 120, self.height - 70, 100, 50, 'HIT')
+        self.stop_button = Button(self.width - 240, self.height - 70, 100, 50, 'STOP')
+        self.restart_button = Button(self.width - 140, self.height - 70, 120, 50, 'RESTART')
+        
     def run(self):
         self.screen.fill(LIGHT_GREEN)
-        
-        hit_button_rect = pygame.Rect(self.width - 120, self.height - 70, 100, 50)
-        stop_button_rect = pygame.Rect(self.width - 240, self.height - 70, 100, 50)
-        restart_button_rect = pygame.Rect(self.width - 140, self.height - 70, 120, 50)
-    
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == K_ESCAPE:
-                    self.game_state_manager.set_state('main_menu')
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    if hit_button_rect.collidepoint(event.pos) and self.game_state.playing:
-                        print("HIT button clicked!")
-                        self.game_state.deal_card(self.game_state.player_hand)
-                        self.game_state.check_game_status()
-                        
-                    elif stop_button_rect.collidepoint(event.pos) and self.game_state.playing:
-                        print("STOP button clicked!")
-                        self.game_state.playing = False
-                        self.game_state.check_game_status()
-                        
-                    elif restart_button_rect.collidepoint(event.pos) and not self.game_state.playing:
-                        print("RESTART button clicked!")
-                        self.game_state.new_game()
-    
-        mouse_pos = pygame.mouse.get_pos()
-        if hit_button_rect.collidepoint(mouse_pos):
-            hit_button_color = hover_color
-        else:
-            hit_button_color = button_color
-
-        if stop_button_rect.collidepoint(mouse_pos):
-            stop_button_color = hover_color
-        else:
-            stop_button_color = button_color       
-
-        if restart_button_rect.collidepoint(mouse_pos):
-            restart_button_color = hover_color
-        else:
-            restart_button_color = button_color             
-
-        # draw title
-        text_surf = pixel_font.render('BLACKJACK PYTHON CASINO', True, BLACK)
-        text_rect = text_surf.get_rect(center=(self.width / 2, 80))
-        self.screen.blit(text_surf, text_rect)
-
-        if self.game_state.playing:
-            # Draw the HIT button
-            pygame.draw.rect(self.screen, hit_button_color, hit_button_rect)
-
-            # Draw text on the HIT button
-            text_surf = small_pixel_font.render('HIT', True, BLACK)
-            text_rect = text_surf.get_rect(center=hit_button_rect.center)
-            self.screen.blit(text_surf, text_rect)
-
-            # Draw the STOP button
-            pygame.draw.rect(self.screen, stop_button_color, stop_button_rect)
-
-            # Draw text on the STOP button
-            text_surf = small_pixel_font.render('STOP', True, BLACK)
-            text_rect = text_surf.get_rect(center=stop_button_rect.center)
-            self.screen.blit(text_surf, text_rect)
-        else:
-            # Draw the RESTART button
-            pygame.draw.rect(self.screen, restart_button_color, restart_button_rect)
-
-            # Draw text on the RESTART button
-            text_surf = small_pixel_font.render('RESTART', True, BLACK)
-            text_rect = text_surf.get_rect(center=restart_button_rect.center)
-            self.screen.blit(text_surf, text_rect)
-
-            # draw result
-            result = 'PLAYER WON' if self.game_state.player_won else 'DEALER WON' if self.game_state.dealer_won else 'TIE'
-            text_surf = pixel_font.render(result, True, BLACK)
-            text_rect = text_surf.get_rect(center=(self.width / 2, 160))
-            self.screen.blit(text_surf, text_rect)
-
-
+        self.handle_events()
+        self.draw()
+  
         # draw dealer hand
         dealer_hand_text =  'Dealer: ' + (str(self.game_state.value_of_hand(self.game_state.dealer_hand)) if not self.game_state.playing else str(self.game_state.dealer_hand[0].value()))
         text_surf = pixel_font.render(dealer_hand_text, True, BLACK)
@@ -124,3 +53,37 @@ class BlackjackScreen:
             position_x = 20 + index * card.image_size()[0] * 1.1
             position_y = self.height - 20
             card.draw_image((position_x, position_y), self.screen)
+    
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == K_ESCAPE:
+                    self.game_state_manager.set_state('main_menu')
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if self.hit_button.check_collision(event.pos) and self.game_state.playing:
+                        self.game_state.deal_card(self.game_state.player_hand)
+                        self.game_state.check_game_status()
+                        
+                    elif self.stop_button.check_collision(event.pos) and self.game_state.playing:
+                        self.game_state.playing = False
+                        self.game_state.check_game_status()
+                        
+                    elif self.restart_button.check_collision(event.pos) and not self.game_state.playing:
+                        self.game_state.new_game()
+                        
+    def draw(self):
+        Text('BLACKJACK PYTHON CASINO').draw(self.screen, (self.width / 2, 80), pixel_font)
+        
+        if self.game_state.playing:
+            self.hit_button.draw(self.screen)
+            self.stop_button.draw(self.screen)
+        else:
+            self.restart_button.draw(self.screen)
+            
+            result = 'PLAYER WON' if self.game_state.player_won else 'DEALER WON' if self.game_state.dealer_won else 'TIE'
+            Text(result).draw(self.screen, (self.width / 2, 160), pixel_font)
+        

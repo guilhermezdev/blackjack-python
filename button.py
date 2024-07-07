@@ -11,7 +11,8 @@ class Button():
         self.height = height
         self.title = title
         
-        self.rect = pygame.Rect(x, y, width, height)
+        self.rect = pygame.Rect(0, 0, width, height)
+        self.rect.center = (x,y)
         
     def draw(self, screen):
         color = button_color
@@ -24,7 +25,7 @@ class Button():
         pygame.draw.rect(screen, color, self.rect)
         
         text = Text(self.title)
-        text.draw(screen, self.rect)
+        text.draw(screen, self.rect.center)
         
     def check_collision(self, pos):
         return self.rect.collidepoint(pos)
