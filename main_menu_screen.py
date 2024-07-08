@@ -19,14 +19,19 @@ class MainMenu:
         
         self.game_state_manger = game_state_manager
         
-        self.play_button =  Button(self.width / 2, 160, 100, 50, 'PLAY')
+        self.play_button =  Button(self.width / 2, 200, 130, 50, 'PLAY')
+        self.options_button = Button(self.width / 2, 260, 130, 50, 'OPTIONS')
+        self.exit_button = Button(self.width / 2, 320, 130, 50, 'EXIT')
         
     def run(self):
         self.screen.fill(LIGHT_GREEN)
         self.handle_events()
         
-        self.play_button.draw(self.screen)
         Text('MAIN MENU').draw(self.screen, (self.width / 2, 80), pixel_font)
+        
+        self.play_button.draw(self.screen)
+        self.options_button.draw(self.screen)
+        self.exit_button.draw(self.screen)
         
     def handle_events(self):
         for event in pygame.event.get():
@@ -36,4 +41,9 @@ class MainMenu:
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.play_button.check_collision(event.pos):
                     self.game_state_manger.set_state('blackjack')
+                if self.options_button.check_collision(event.pos):
+                    self.game_state_manger.set_state('options')
+                elif self.exit_button.check_collision(event.pos):
+                    pygame.quit()
+                    sys.exit()
         
