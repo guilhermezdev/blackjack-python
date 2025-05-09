@@ -1,7 +1,7 @@
 import  pygame
-from assets import *
+from utils.assets import *
 
-from text import *
+from ui.text import *
  
 class Button():
     def __init__(self, x, y, width, height, title):

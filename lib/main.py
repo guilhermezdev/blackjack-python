@@ -1,11 +1,9 @@
 import  pygame
 
-from assets import *
-
-from main_menu_screen import *
-from blackjack_screen import *
-from options_screen import *
-from game_state_manager import *
+from screens.main_menu_screen import *
+from screens.blackjack_screen import *
+from screens.options_screen import *
+from utils.game_state_manager import *
 
 w = 960
 h = 540

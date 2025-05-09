@@ -1,15 +1,13 @@
 import pygame, sys
 
-from assets import *
-
 from pygame.surface import Surface
 
-from game_state_manager import *
+from utils.game_state_manager import *
 
-from button import *
+from ui.button import *
 
-from assets import *
-from text import *
+from utils.assets import *
+from ui.text import *
 
 class Options:
     def __init__(self, screen: Surface, game_state_manager: GameStateManager):

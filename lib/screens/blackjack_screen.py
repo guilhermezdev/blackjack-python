@@ -3,13 +3,13 @@ import pygame, sys
 from pygame.surface import Surface
 from pygame.locals import *
 
-from assets import *
+from utils.assets import *
 
-from blackjack_game import *
-from game_state_manager import *
+from utils.blackjack_game import *
+from utils.game_state_manager import *
 
-from button import *
-from text import *
+from ui.button import *
+from ui.text import *
 
 class BlackjackScreen:
     def __init__(self, screen: Surface, game_state_manager: GameStateManager ):

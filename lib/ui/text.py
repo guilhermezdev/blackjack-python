@@ -1,8 +1,7 @@
 from pygame.surface import Surface
 from pygame.font import Font
-from pygame.rect import Rect
 
-from assets import *
+from utils.assets import *
 
 class Text():
     def __init__(self, text):

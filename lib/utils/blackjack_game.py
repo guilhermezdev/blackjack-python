@@ -1,7 +1,7 @@
 import random, functools
 from typing import List
 
-from card import *
+from ui.card import *
 
 class BlackjackGame:
     def __init__(self):
