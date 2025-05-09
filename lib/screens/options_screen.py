@@ -9,6 +9,8 @@ from ui.button import *
 from utils.assets import *
 from ui.text import *
 
+from utils.config import *
+
 class Options:
     def __init__(self, screen: Surface, game_state_manager: GameStateManager):
         self.screen = screen
@@ -17,7 +19,10 @@ class Options:
         
         self.game_state_manger = game_state_manager
         
+        self.muted = game_config.get_muted()
+        
         self.back_button = Button(self.width / 2, 320, 130, 50, 'BACK')
+        self.mute_button = Button(self.width / 2, 200, 130, 50,  'UNMUTE' if self.muted else 'MUTE')
         
     def run(self):
         self.screen.fill(LIGHT_GREEN)
@@ -26,6 +31,7 @@ class Options:
         Text('OPTIONS').draw(self.screen, (self.width / 2, 80), pixel_font)
 
         self.back_button.draw(self.screen)
+        self.mute_button.draw(self.screen)
         
     def handle_events(self):
         for event in pygame.event.get():
@@ -35,3 +41,7 @@ class Options:
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.back_button.check_collision(event.pos):
                     self.game_state_manger.set_state('main_menu')
+                elif self.mute_button.check_collision(event.pos):
+                    self.muted = not self.muted
+                    game_config.set_muted(self.muted)
+                    pygame.mixer.music.set_volume(0 if self.muted else 1)
