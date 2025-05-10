@@ -3,9 +3,15 @@ from typing import List
 
 from ui.card import *
 
+from enum import Enum
+
+class GameStep(Enum):
+    BETTING = 1
+    PLAYING = 2
+    GAME_OVER = 3
+
 class BlackjackGame:
     def __init__(self):
-        self.playing = True
         self.dealer_hand = []
         self.player_hand = []
         
@@ -16,6 +22,11 @@ class BlackjackGame:
         random.shuffle(deck)
         
         self.shoe_deck = deck * 6
+
+        self.player_chips = 1000
+        self.bet = 0
+
+        self.game_step = GameStep.PLAYING
 
     def deal_card(self, hand: List[Card]):
         hand.append(self.shoe_deck.pop())     
@@ -33,14 +44,14 @@ class BlackjackGame:
         player_hand_value = self.value_of_hand(self.player_hand)
 
         if player_hand_value > 21:
-            self.playing = False
+            self.game_step = GameStep.GAME_OVER
             self.dealer_won = True
         elif player_hand_value == 21:
-            self.playing = False
+            self.game_step = GameStep.GAME_OVER
             if len(self.player_hand) == 2:
                 self.player_won = True
 
-        if not self.playing and not self.player_won and not self.dealer_won:
+        if self.game_step is GameStep.GAME_OVER and not self.player_won and not self.dealer_won:
             while self.value_of_hand(self.dealer_hand) < 17:
                 self.deal_card(self.dealer_hand)
 
@@ -59,7 +70,7 @@ class BlackjackGame:
                 self.dealer_won = True
                 
     def new_game(self):
-        self.playing = True
+        self.game_step = GameStep.PLAYING
         self.player_won = False
         self.dealer_won = False
         

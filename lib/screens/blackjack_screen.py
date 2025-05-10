@@ -20,70 +20,71 @@ class BlackjackScreen:
         
         self.game_state_manager = game_state_manager
         
-        self.game_state = BlackjackGame()
-        self.game_state.new_game()
+        self.blackjack_game = BlackjackGame()
+        self.blackjack_game.new_game()
         
         self.hit_button = Button(self.width - 120, self.height - 70, 100, 50, 'HIT')
         self.stop_button = Button(self.width - 240, self.height - 70, 100, 50, 'STOP')
         self.restart_button = Button(self.width - 140, self.height - 70, 120, 50, 'RESTART')
         
     def run(self):
-        self.screen.fill(LIGHT_GREEN)
-        self.handle_events()
+        self.handle_basic_events()
+
         self.draw()
-  
-        # draw dealer hand
-        dealer_hand_text =  'Dealer: ' + (str(self.game_state.value_of_hand(self.game_state.dealer_hand)) if not self.game_state.playing else str(self.game_state.dealer_hand[0].value()))
-        text_surf = pixel_font.render(dealer_hand_text, True, BLACK)
-        text_rect = text_surf.get_rect(bottomleft=(20, self.height - 250))
-        self.screen.blit(text_surf, text_rect)
 
-        for index, card in enumerate(self.game_state.dealer_hand):
-            position_x = 20 + index * card.image_size()[0] * 1.1
-            position_y = self.height - 170
-            card.draw_image((position_x, position_y), self.screen, self.game_state.playing and index > 0)
-
-        # draw player hand
-        player_hand_text =  'Player: ' + str(self.game_state.value_of_hand(self.game_state.player_hand))
-        text_surf = pixel_font.render(player_hand_text, True, BLACK)
-        text_rect = text_surf.get_rect(bottomleft=(20, self.height - 100))
-        self.screen.blit(text_surf, text_rect)
-
-        for index, card in enumerate(self.game_state.player_hand):
-            position_x = 20 + index * card.image_size()[0] * 1.1
-            position_y = self.height - 20
-            card.draw_image((position_x, position_y), self.screen)
-    
-    def handle_events(self):
+    def handle_basic_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+               pygame.quit()
+               sys.exit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == K_ESCAPE:
-                    self.game_state_manager.set_state('main_menu')
+               if event.key == K_ESCAPE:
+                   self.game_state_manager.set_state('main_menu')      
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    if self.hit_button.check_collision(event.pos) and self.game_state.playing:
-                        self.game_state.deal_card(self.game_state.player_hand)
-                        self.game_state.check_game_status()
-                        
-                    elif self.stop_button.check_collision(event.pos) and self.game_state.playing:
-                        self.game_state.playing = False
-                        self.game_state.check_game_status()
-                        
-                    elif self.restart_button.check_collision(event.pos) and not self.game_state.playing:
-                        self.game_state.new_game()
-                        
+                    if self.blackjack_game.game_step is GameStep.PLAYING:
+                        if self.hit_button.check_collision(event.pos):
+                            self.blackjack_game.deal_card(self.blackjack_game.player_hand)
+                            self.blackjack_game.check_game_status()
+                            
+                        elif self.stop_button.check_collision(event.pos):
+                            self.blackjack_game.game_step = GameStep.GAME_OVER
+                            self.blackjack_game.check_game_status()
+
+                    elif self.blackjack_game.game_step is GameStep.GAME_OVER:
+                        if self.restart_button.check_collision(event.pos):
+                            self.blackjack_game.new_game()   
+                    
     def draw(self):
+        self.screen.fill(LIGHT_GREEN)
+
         Text('BLACKJACK PYTHON CASINO').draw(self.screen, (self.width / 2, 80), pixel_font)
+
+        if self.blackjack_game.game_step is GameStep.PLAYING:
+            # draw dealer hand
+            self.draw_hand('Dealer', self.blackjack_game.dealer_hand, self.height - 250, True)
+
+            # draw player hand
+            self.draw_hand('Player', self.blackjack_game.player_hand, self.height - 100)
         
-        if self.game_state.playing:
             self.hit_button.draw(self.screen)
             self.stop_button.draw(self.screen)
-        else:
+
+        elif self.blackjack_game.game_step is GameStep.GAME_OVER:
             self.restart_button.draw(self.screen)
             
-            result = 'PLAYER WON' if self.game_state.player_won else 'DEALER WON' if self.game_state.dealer_won else 'TIE'
+            result = 'PLAYER WON' if self.blackjack_game.player_won else 'DEALER WON' if self.blackjack_game.dealer_won else 'TIE'
             Text(result).draw(self.screen, (self.width / 2, 160), pixel_font)
+
+    def draw_hand(self, name, hand, pos_y, hide = False):
+        hand_value =  self.blackjack_game.value_of_hand(hand) if not hide else self.blackjack_game.dealer_hand[0].value()
+        player_hand_text =  f'{name}: ' + str(hand_value)
+        text_surf = pixel_font.render(player_hand_text, True, BLACK)
+        text_rect = text_surf.get_rect(bottomleft=(20, pos_y))
+        self.screen.blit(text_surf, text_rect)
+
+        for index, card in enumerate(hand):
+            position_x = 20 + index * card.image_size()[0] * 1.1
+            position_y = pos_y + 80
+            card.draw_image((position_x, position_y), self.screen, hide and index > 0)
         
