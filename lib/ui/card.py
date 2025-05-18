@@ -1,4 +1,5 @@
 import pygame
+from utils.assets import *
 
 suits = ['spades', 'clubs', 'diamonds', 'hearts']
 ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
@@ -8,10 +9,11 @@ class Card:
         self.rank = rank
         self.suit = suit
         
-        image = pygame.image.load(f'assets/images/cards/{self.suit}/{self.rank}.png')
-        original_size = image.get_size()
-        new_size = (original_size[0] * 2, original_size[1] * 2)
-        self.image = pygame.transform.scale(image, new_size)
+        # image = pygame.image.load(f'assets/images/cards/{self.suit}/{self.rank}.png')
+        self.image = pygame.image.load(f'assets/images/cards/card.png')
+        # original_size = image.get_size()
+        # new_size = (original_size[0] * 2, original_size[1] * 2)
+        # self.image = pygame.transform.scale(image, new_size)
         
         image_back = pygame.image.load(f'assets/images/cards/backs/back_0.png')
         original_size = image_back.get_size()
@@ -34,7 +36,10 @@ class Card:
     def draw_image(self, position, screen, showBack=False):
         image = self.image if not showBack else self.image_back
         image_rect = image.get_rect(bottomleft=position)
+        
         screen.blit(image, image_rect)
+
+        pygame.draw.rect(screen, WHITE, image_rect, 1, 4)
     
     def __repr__(self):
         return f'{self.rank} of {self.suit}'
