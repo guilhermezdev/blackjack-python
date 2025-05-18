@@ -47,8 +47,8 @@ class BlackjackGame:
         return value
     
     def stand(self):
-        self.game_step = GameStep.RESULT
         self.check_game_status()
+        self.show_result()
 
     def show_result(self):
         self.game_step = GameStep.RESULT

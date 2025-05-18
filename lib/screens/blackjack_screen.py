@@ -113,7 +113,7 @@ class BlackjackScreen:
 
         for index, card in enumerate(hand):
             card_width = card.image_size()[0]
-            position_x = (self.width / 2  - card_width / 2) + (index * card_width * 0.35)
+            position_x = (self.width / 2  - card_width / 2) + (index * card_width * 0.25)
             position_y = pos_y + 80
             card.draw_image((position_x, position_y), self.screen, hide and index > 0)
         

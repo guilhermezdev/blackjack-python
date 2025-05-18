@@ -9,15 +9,14 @@ class Card:
         self.rank = rank
         self.suit = suit
         
-        # image = pygame.image.load(f'assets/images/cards/{self.suit}/{self.rank}.png')
-        self.image = pygame.image.load(f'assets/images/cards/card.png')
-        # original_size = image.get_size()
-        # new_size = (original_size[0] * 2, original_size[1] * 2)
-        # self.image = pygame.transform.scale(image, new_size)
+        image = pygame.image.load(f'assets/images/cards/{self.suit}/{self.rank}.png')
+        original_size = image.get_size()
+        new_size = (original_size[0] * 5 , original_size[1] * 5)
+        self.image = pygame.transform.scale(image, new_size)
         
         image_back = pygame.image.load(f'assets/images/cards/backs/back_0.png')
         original_size = image_back.get_size()
-        new_size = (original_size[0] * 2, original_size[1] * 2)
+        new_size = (original_size[0] * 5, original_size[1] * 5)
         self.image_back = pygame.transform.scale(image_back, new_size)
     
     def value(self):
@@ -39,7 +38,7 @@ class Card:
         
         screen.blit(image, image_rect)
 
-        pygame.draw.rect(screen, WHITE, image_rect, 1, 4)
+        # pygame.draw.rect(screen, WHITE, image_rect, 1, 4)
     
     def __repr__(self):
         return f'{self.rank} of {self.suit}'
