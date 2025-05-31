@@ -3,7 +3,7 @@ from pygame.font import Font
 
 from utils.assets import *
 
-class Text():
+class TextUI:
     def __init__(self, text):
         self.text = text
     

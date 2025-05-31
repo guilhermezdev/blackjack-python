@@ -21,14 +21,14 @@ class Options:
         
         self.muted = game_config.get_muted()
         
-        self.back_button = Button(self.width / 2, 320, 130, 50, 'BACK')
-        self.mute_button = Button(self.width / 2, 200, 130, 50,  'UNMUTE' if self.muted else 'MUTE')
+        self.back_button = ButtonUI(self.width / 2, 320, 130, 50, 'BACK')
+        self.mute_button = ButtonUI(self.width / 2, 200, 130, 50,  'UNMUTE' if self.muted else 'MUTE')
         
     def run(self):
         self.screen.fill(LIGHT_GREEN)
         self.handle_events()
         
-        Text('OPTIONS').draw(self.screen, (self.width / 2, 80), pixel_font)
+        TextUI('OPTIONS').draw(self.screen, (self.width / 2, 80), pixel_font)
 
         self.back_button.draw(self.screen)
         self.mute_button.draw(self.screen)

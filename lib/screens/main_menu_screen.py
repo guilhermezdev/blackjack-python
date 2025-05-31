@@ -19,9 +19,9 @@ class MainMenu:
         self.game_state_manger = game_state_manager
 
         self.buttons = [
-            Button(self.width / 2, 200, 130, 50, 'PLAY', lambda: self.game_state_manger.set_state('blackjack')),
-            Button(self.width / 2, 260, 130, 50, 'OPTIONS', lambda: self.game_state_manger.set_state('options')),
-            Button(self.width / 2, 320, 130, 50, 'EXIT', lambda: self.exit())
+            ButtonUI(self.width / 2, 200, 130, 50, 'PLAY', lambda: self.game_state_manger.set_state('blackjack')),
+            ButtonUI(self.width / 2, 260, 130, 50, 'OPTIONS', lambda: self.game_state_manger.set_state('options')),
+            ButtonUI(self.width / 2, 320, 130, 50, 'EXIT', lambda: self.exit())
         ]
 
     def exit(self):
@@ -32,7 +32,7 @@ class MainMenu:
         self.screen.fill(LIGHT_GREEN)
         self.handle_events()
         
-        Text('MAIN MENU').draw(self.screen, (self.width / 2, 80), pixel_font)
+        TextUI('MAIN MENU').draw(self.screen, (self.width / 2, 80), pixel_font)
 
         for button in self.buttons:
             button.draw(self.screen)

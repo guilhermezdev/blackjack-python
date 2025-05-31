@@ -3,7 +3,7 @@ from utils.assets import *
 
 from ui.text import *
  
-class Button():
+class ButtonUI:
     def __init__(self, x, y, width, height, title, callback = None):
         self.x = x
         self.y = y
@@ -28,7 +28,7 @@ class Button():
         # draw button border
         pygame.draw.rect(screen, GRAY, self.rect, 2, border_radius= 8)
         
-        text = Text(self.title)
+        text = TextUI(self.title)
         text.draw(screen, self.rect.center)
         
     def check_collision(self, pos):
