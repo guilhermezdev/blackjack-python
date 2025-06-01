@@ -32,7 +32,7 @@ class MainMenu:
         self.screen.fill(LIGHT_GREEN)
         self.handle_events()
         
-        TextUI('MAIN MENU').draw(self.screen, (self.width / 2, 80), pixel_font)
+        TextUI('MAIN MENU').draw(self.screen, (self.width / 2, 80), regular_font)
 
         for button in self.buttons:
             button.draw(self.screen)

@@ -7,7 +7,7 @@ class TextUI:
     def __init__(self, text):
         self.text = text
     
-    def draw(self, screen: Surface, center : tuple[float, float], font: Font = small_pixel_font):
+    def draw(self, screen: Surface, center : tuple[float, float], font: Font = small_font):
         text_surf = font.render(self.text, True, BLACK)
         text_rect = text_surf.get_rect(center=center)
         screen.blit(text_surf, text_rect)

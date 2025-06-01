@@ -33,8 +33,10 @@ class BlackjackScreen:
 
         self.cash_out_button = ButtonUI(100, 40, 140, 50, 'Cash Out')
         
-        self.hit_button = ButtonUI(self.width - 120, self.height - 110, 100, 50, 'Hit')
-        self.stand_button = ButtonUI(self.width - 120, self.height - 50, 100, 50, 'Stand')
+        self.hit_button = ButtonUI(self.width - 120, self.height - 110, 100, 50, 'Hit', self.player_hit)
+        self.stand_button = ButtonUI(self.width - 120, self.height - 50, 100, 50, 'Stand', self.player_stand)
+
+        self.play_again_button = ButtonUI(self.width - 120, self.height - 110, 100, 50, 'Play Again', self.play_again)
 
         self.betting_buttons = [
             ButtonUI(self.width / 2 - 140, self.height - 150, 50, 50, '5', lambda : self.update_bet(5)),
@@ -42,7 +44,7 @@ class BlackjackScreen:
             ButtonUI(self.width / 2 , self.height - 150, 50, 50, '25', lambda : self.update_bet(25)),
             ButtonUI(self.width / 2 + 70, self.height - 150, 50, 50, '100', lambda : self.update_bet(100)),
             ButtonUI(self.width / 2 + 140, self.height - 150, 50, 50, '500', lambda : self.update_bet(500)),
-            ButtonUI(self.width / 2, self.height - 70, 100, 50, 'BET', lambda: self.start_round())
+            ButtonUI(self.width / 2, self.height - 70, 100, 50, 'BET', self.start_round)
         ]
 
         self.game_step = GameStep.BETTING
@@ -57,8 +59,26 @@ class BlackjackScreen:
         self.draw()
     
     def start_round(self):
-        self.blackjack_game.start_round(self.current_bet)
-        self.game_step = GameStep.PLAYING
+        if self.current_bet > 0 and self.current_bet < self.blackjack_game.money:
+            self.blackjack_game.start_round(self.current_bet)
+            self.game_step = GameStep.PLAYING
+
+    def player_hit(self):
+        self.blackjack_game.player_hit()
+        if self.blackjack_game.player_hand.busted() or self.blackjack_game.player_hand.value() == 21:
+            self.blackjack_game.dealer_play()
+            self.result = self.blackjack_game.stop_round()
+            self.game_step = GameStep.RESULT
+    
+    def player_stand(self):
+        self.blackjack_game.dealer_play()
+        self.result = self.blackjack_game.stop_round()
+        self.game_step = GameStep.RESULT
+
+    def play_again(self):
+        self.current_bet = 0
+        self.result = None
+        self.game_step = GameStep.BETTING
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -76,64 +96,54 @@ class BlackjackScreen:
                         self.game_state_manager.set_state('main_menu')
 
                     if self.game_step == GameStep.PLAYING:
-                        if self.hit_button.check_collision(event.pos):
-                            self.blackjack_game.player_hit()
-                            if self.blackjack_game.player_hand.busted():
-                                self.blackjack_game.dealer_play()
-                                self.result = self.blackjack_game.stop_round()
-                                self.game_step = GameStep.RESULT
-
-                        elif self.stand_button.check_collision(event.pos):
-                            self.blackjack_game.dealer_play()
-                            self.result = self.blackjack_game.stop_round()
-                            self.game_step = GameStep.RESULT
-
+                        self.hit_button.check_and_perform_click(event.pos)
+                        self.stand_button.check_and_perform_click(event.pos)
                     elif self.game_step == GameStep.BETTING:
                         for button in self.betting_buttons:
                             button.check_and_perform_click(event.pos)
+                    elif self.game_step == GameStep.RESULT:
+                        self.play_again_button.check_and_perform_click(event.pos)
                     
     def draw(self):
         self.screen.fill(WHITE)
 
-        TextUI('BLACKJACK').draw(self.screen, (self.width / 2, 40), pixel_font)
+        TextUI('BLACKJACK').draw(self.screen, (self.width / 2, 40), regular_font)
 
         self.cash_out_button.draw(self.screen)
 
+        TextUI(f'Money: {self.blackjack_game.money}').draw(self.screen, (self.width - 200, 80), regular_font)
+
         if self.game_step == GameStep.BETTING:
-            TextUI(f'BET:{self.current_bet}').draw(self.screen, (self.width / 2, self.height / 2), pixel_font)
+            TextUI(f'BET:{self.current_bet}').draw(self.screen, (self.width / 2, self.height / 2), regular_font)
             for button in self.betting_buttons:
                 button.draw(self.screen)
 
         if self.game_step == GameStep.PLAYING:
-            # draw dealer hand
-            self.draw_hand('Dealer', self.blackjack_game.dealer_hand, 150, True)
+            TextUI(f'Bet: {self.blackjack_game.bet}').draw(self.screen, (self.width - 200, 120), regular_font)
 
-            # draw player hand
-            self.draw_hand('Player', self.blackjack_game.player_hand, self.height - 100)
+            self.draw_hand( self.blackjack_game.dealer_hand, 200, True)
+            self.draw_hand( self.blackjack_game.player_hand, self.height - 160)
         
             self.hit_button.draw(self.screen)
             self.stand_button.draw(self.screen)
 
         elif self.game_step == GameStep.RESULT:
-            result = str(self.result)
-            TextUI(result).draw(self.screen, (self.width / 2, self.height / 2), pixel_font)
+            TextUI(str(self.result)).draw(self.screen, (self.width / 2, self.height / 2), regular_font)
 
-            # draw dealer hand
-            self.draw_hand('Dealer', self.blackjack_game.dealer_hand, 150, False)
+            self.play_again_button.draw(self.screen)
 
-            # draw player hand
-            self.draw_hand('Player', self.blackjack_game.player_hand, self.height - 100)
+            self.draw_hand( self.blackjack_game.dealer_hand, 200, False)
+            self.draw_hand( self.blackjack_game.player_hand, self.height - 160)
 
-    def draw_hand(self, name, hand: Hand, pos_y, hide = False):
-        player_hand_text =  f'{name}: ' + str(hand.value())
-        text_surf = pixel_font.render(player_hand_text, True, BLACK)
-        text_rect = text_surf.get_rect(bottomleft=(20, pos_y))
+    def draw_hand(self,  hand: Hand, pos_y: int, hide = False):
+        player_hand_text = str(hand.value()) if not hide else '??'
+        text_surf = regular_font.render(player_hand_text, True, BLACK)
+        text_rect = text_surf.get_rect(bottomleft=(20, pos_y + 80))
         self.screen.blit(text_surf, text_rect)
 
         for index, card in enumerate(hand.cards):
             card_ui = CardUI(card.rank, card.suit)
             card_width = card_ui.image_size()[0]
-            position_x = (self.width / 2  - card_width / 2) + (index * card_width * 0.25)
-            position_y = pos_y + 80
-            card_ui.draw_image((position_x, position_y), self.screen, hide and index > 0)
+            position_x =  card_width / 2 + (index * card_width * 0.3)
+            card_ui.draw_image((position_x, pos_y), self.screen, hide and index > 0)
         

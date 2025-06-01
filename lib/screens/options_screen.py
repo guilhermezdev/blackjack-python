@@ -28,7 +28,7 @@ class Options:
         self.screen.fill(LIGHT_GREEN)
         self.handle_events()
         
-        TextUI('OPTIONS').draw(self.screen, (self.width / 2, 80), pixel_font)
+        TextUI('OPTIONS').draw(self.screen, (self.width / 2, 80), regular_font)
 
         self.back_button.draw(self.screen)
         self.mute_button.draw(self.screen)
