@@ -20,8 +20,9 @@ class MainMenu:
 
         self.buttons = [
             ButtonUI(self.width / 2, 200, 130, 50, 'BLACKJACK', lambda: self.game_state_manger.set_state('blackjack')),
-            ButtonUI(self.width / 2, 260, 130, 50, 'OPTIONS', lambda: self.game_state_manger.set_state('options')),
-            ButtonUI(self.width / 2, 320, 130, 50, 'EXIT', lambda: self.exit())
+            ButtonUI(self.width / 2, 260, 130, 50, '2048', lambda: self.game_state_manger.set_state('2048')),
+            ButtonUI(self.width / 2, 320, 130, 50, 'OPTIONS', lambda: self.game_state_manger.set_state('options')),
+            ButtonUI(self.width / 2, 380, 130, 50, 'EXIT', lambda: self.exit())
         ]
 
     def exit(self):

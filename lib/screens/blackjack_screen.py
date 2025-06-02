@@ -5,7 +5,7 @@ from pygame.locals import *
 
 from utils.assets import *
 
-from game_logic import *
+from game_logic.game_logic_blackjack import *
 from utils.game_state_manager import GameStateManager
 
 from ui.button import ButtonUI

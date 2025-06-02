@@ -3,6 +3,7 @@ import  pygame
 from screens.main_menu_screen import *
 from screens.blackjack_screen import *
 from screens.options_screen import *
+from screens.game_2048_screen import *
 from utils.game_state_manager import *
 from utils.config import *
 
@@ -28,8 +29,9 @@ class Game:
         self.main_menu_screen = MainMenu(self.screen, self.game_state_manager)
         self.options_screen = Options(self.screen, self.game_state_manager)
         self.blackjack_screen = BlackjackScreen(self.screen, self.game_state_manager)
+        self.game_2048_screen = Game2048Screen(self.screen, self.game_state_manager)
         
-        self.game_states = {'main_menu': self.main_menu_screen, 'options': self.options_screen,'blackjack': self.blackjack_screen}
+        self.game_states = {'main_menu': self.main_menu_screen, 'options': self.options_screen,'blackjack': self.blackjack_screen, '2048': self.game_2048_screen}
         
     def run(self):
         while True:

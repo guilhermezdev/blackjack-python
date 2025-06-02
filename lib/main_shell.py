@@ -1,5 +1,5 @@
 import sys
-from game_logic import Hand, BlackJackGame
+from game_logic.game_logic_blackjack import Hand, BlackJackGame
 
 def place_bet(money: int):
     while True:
