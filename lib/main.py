@@ -12,9 +12,9 @@ h = 540
 class Game:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption('Blackjack')
+        pygame.display.set_caption('Pycade')
 
-        is_game_muted = game_config.get_muted();
+        is_game_muted = game_config.get_muted()
 
         pygame.mixer.music.load('assets/gnome_music.mp3')
         pygame.mixer.music.set_volume(0 if is_game_muted else 1)

@@ -7,7 +7,6 @@ from utils.assets import *
 
 from game_logic import *
 from utils.game_state_manager import GameStateManager
-from utils.events import *
 
 from ui.button import ButtonUI
 from ui.text import TextUI
@@ -33,6 +32,7 @@ class BlackjackScreen:
 
         self.cash_out_button = ButtonUI(100, 40, 140, 50, 'Cash Out')
         
+        self.double_down_button = ButtonUI(self.width - 120, self.height - 170, 100, 50, 'Double Down', self.player_double_down)
         self.hit_button = ButtonUI(self.width - 120, self.height - 110, 100, 50, 'Hit', self.player_hit)
         self.stand_button = ButtonUI(self.width - 120, self.height - 50, 100, 50, 'Stand', self.player_stand)
 
@@ -57,7 +57,7 @@ class BlackjackScreen:
     def run(self):
         self.handle_events()
         self.draw()
-    
+
     def start_round(self):
         if self.current_bet > 0 and self.current_bet < self.blackjack_game.money:
             self.blackjack_game.start_round(self.current_bet)
@@ -71,6 +71,13 @@ class BlackjackScreen:
             self.game_step = GameStep.RESULT
     
     def player_stand(self):
+        self.blackjack_game.dealer_play()
+        self.result = self.blackjack_game.stop_round()
+        self.game_step = GameStep.RESULT
+    
+    def player_double_down(self):
+        self.blackjack_game.double_down()
+        self.blackjack_game.player_hit()
         self.blackjack_game.dealer_play()
         self.result = self.blackjack_game.stop_round()
         self.game_step = GameStep.RESULT
@@ -88,22 +95,36 @@ class BlackjackScreen:
             elif event.type == pygame.KEYDOWN:
                if event.key == K_ESCAPE:
                    self.game_state_manager.set_state('main_menu')
-            elif event.type == go_to_betting_step:
-                self.game_step = GameStep.BETTING
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    if self.cash_out_button.check_collision(event.pos):
-                        self.game_state_manager.set_state('main_menu')
+            else:
+                self.handle_game_events(event)
 
-                    if self.game_step == GameStep.PLAYING:
-                        self.hit_button.check_and_perform_click(event.pos)
-                        self.stand_button.check_and_perform_click(event.pos)
-                    elif self.game_step == GameStep.BETTING:
-                        for button in self.betting_buttons:
-                            button.check_and_perform_click(event.pos)
-                    elif self.game_step == GameStep.RESULT:
-                        self.play_again_button.check_and_perform_click(event.pos)
-                    
+    def handle_game_events(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if self.cash_out_button.check_collision(event.pos):
+                    self.game_state_manager.set_state('main_menu')
+                if self.game_step == GameStep.PLAYING:
+                    self.double_down_button.check_and_perform_click(event.pos)
+                    self.hit_button.check_and_perform_click(event.pos)
+                    self.stand_button.check_and_perform_click(event.pos)
+                elif self.game_step == GameStep.BETTING:
+                    for button in self.betting_buttons:
+                        button.check_and_perform_click(event.pos)
+                elif self.game_step == GameStep.RESULT:
+                    self.play_again_button.check_and_perform_click(event.pos)
+
+    def result_label(self, result: BlackJackGameResult):
+        result_labels = {
+            BlackJackGameResult.PLAYER_WON_BLACKJACK: "Blackjack! Player Win",
+            BlackJackGameResult.DEALER_WON_BLACKJACK: "Dealer Blackjack! Player Lose",
+            BlackJackGameResult.PLAYER_WON: "Player Win",
+            BlackJackGameResult.DEALER_WON: "Dealer Wins",
+            BlackJackGameResult.PLAYER_BUSTED: "Player Busted! Dealer Wins",
+            BlackJackGameResult.DEALER_BUSTED: "Dealer Busted! Player Win",
+            BlackJackGameResult.TIE: "Push — It's a Tie",
+        }
+        return result_labels[result]
+
     def draw(self):
         self.screen.fill(WHITE)
 
@@ -114,7 +135,7 @@ class BlackjackScreen:
         TextUI(f'Money: {self.blackjack_game.money}').draw(self.screen, (self.width - 200, 80), regular_font)
 
         if self.game_step == GameStep.BETTING:
-            TextUI(f'BET:{self.current_bet}').draw(self.screen, (self.width / 2, self.height / 2), regular_font)
+            TextUI(f'BET: {self.current_bet}').draw(self.screen, (self.width / 2, self.height / 2), regular_font)
             for button in self.betting_buttons:
                 button.draw(self.screen)
 
@@ -124,11 +145,14 @@ class BlackjackScreen:
             self.draw_hand( self.blackjack_game.dealer_hand, 200, True)
             self.draw_hand( self.blackjack_game.player_hand, self.height - 160)
         
+            if self.blackjack_game.can_double_down():
+                self.double_down_button.draw(self.screen)
+
             self.hit_button.draw(self.screen)
             self.stand_button.draw(self.screen)
 
         elif self.game_step == GameStep.RESULT:
-            TextUI(str(self.result)).draw(self.screen, (self.width / 2, self.height / 2), regular_font)
+            TextUI(self.result_label(self.result)).draw(self.screen, (self.width / 2, 140), regular_font)
 
             self.play_again_button.draw(self.screen)
 
