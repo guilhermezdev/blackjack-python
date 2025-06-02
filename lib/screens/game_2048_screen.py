@@ -32,8 +32,10 @@ class Game2048Screen:
             elif event.type == pygame.KEYDOWN:
                if event.key == K_ESCAPE:
                    self.game_state_manager.set_state('main_menu')
-               if event.key == K_LEFT:
-                   self.game_logic.move_left()
+               elif event.key == K_LEFT:
+                   self.game_logic.move_horizontal()
+               elif event.key == K_RIGHT:
+                   self.game_logic.move_horizontal(move_right=True)
 
     def draw(self):
         self.screen.fill(WHITE)

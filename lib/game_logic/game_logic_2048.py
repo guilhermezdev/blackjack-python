@@ -20,26 +20,31 @@ class GameLogic2048:
         for y, row in enumerate(self.grid):
             for x, value in enumerate(row):
                 if value == 0:
-                    positions.append((x, y))
+                    positions.append((y, x))
         return positions
         
     def insert_at_random_empty_space(self):
         position = random.choice(self.empty_positions())
         value = 2
-        self.grid[position[1]][position[0]] = value
+        self.grid[position[0]][position[1]] = value
 
-        
-    def move_left(self):
+    # Moves the grid in the horizontal axis.
+    # By default it moves to the left, if moving to the right
+    # we invert the row, move to the left and invert back.   
+    def move_horizontal(self, move_right: bool = False):
         new_grid = []
         for row in self.grid:
             # remove empty spaces
             merged_row = [value for value in row if value != 0]
+
+            # if its a move to the right, we first invert the row
+            if move_right:
+                merged_row = merged_row[::-1]
             
-            # print(new_row, len(new_row))
             # merging neighbours with same value on the horizontal
-            for index in range(len(merged_row) - 1):
-                if merged_row[index] == merged_row[index + 1]:
-                    merged_row[index] *= 2
+            for index, value in enumerate(merged_row[:-1]):
+                if value == merged_row[index + 1]:
+                    merged_row[index] = value * 2
                     merged_row[index + 1] = 0
             
             # remove empty spaces after merge
@@ -48,30 +53,16 @@ class GameLogic2048:
             # fill up the empty space
             while(len(merged_row) < self.grid_size):
                 merged_row.append(0)
+
+            # if its a move to the right we need to invert back the row
+            if move_right:
+                merged_row = merged_row[::-1]
             
             new_grid.append(merged_row)
+
         self.grid = new_grid
         if self.has_empty_space():
             self.insert_at_random_empty_space()
 
-    def move_right(self):
-        new_grid = []
-        for row in self.grid:
-            # remove empty spaces
-            new_row = [value for value in row if value != 0]
-
-            # merging neighbours with same value on the horizontal
-            for index in range(len(new_row) - 1):
-                if new_row[index] == row[index + 1]:
-                    new_row[index] *= 2
-                    new_row[index + 1] = 0
-            
-            # remove empty spaces after merge
-            new_row = [value for value in new_row if value != 0]
-       
-            # fill up the empty space
-            while(len(new_row) < self.grid_size):
-                new_row.insert(0, 0)
-            
-            new_grid.append(new_row)
-        self.grid = new_grid      
+    def move_vertical(self):
+        pass
