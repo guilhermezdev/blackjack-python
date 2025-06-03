@@ -25,6 +25,8 @@ class Game2048Screen:
 
         self.animation = None
 
+        self.playing = True
+
     def run(self):
         self.handle_events()
         self.draw()
@@ -37,29 +39,34 @@ class Game2048Screen:
             elif event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:
                     self.game_state_manager.set_state('main_menu')
-                elif event.key == K_LEFT:
+                elif self.playing and event.key == K_LEFT:
                     self.game_logic.move_left()
                     new_position = self.game_logic.insert_at_random_empty_space()
                     self.animation = (new_position, 200, pygame.time.get_ticks())
+                    self.playing = not self.game_logic.no_moves_left
 
-                elif event.key == K_RIGHT:
+                elif self.playing and event.key == K_RIGHT:
                     self.game_logic.move_right()
                     new_position = self.game_logic.insert_at_random_empty_space()
                     self.animation = (new_position, 200, pygame.time.get_ticks())
+                    self.playing = not self.game_logic.no_moves_left
 
-                elif event.key == K_UP:
+                elif self.playing and event.key == K_UP:
                     self.game_logic.move_up()
                     new_position = self.game_logic.insert_at_random_empty_space()
                     self.animation = (new_position, 200, pygame.time.get_ticks())
+                    self.playing = not self.game_logic.no_moves_left
 
-                elif event.key == K_DOWN:
+                elif self.playing and event.key == K_DOWN:
                     self.game_logic.move_down()
                     new_position = self.game_logic.insert_at_random_empty_space()
                     self.animation = (new_position, 200, pygame.time.get_ticks())
+                    self.playing = not self.game_logic.no_moves_left
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.restart_button.check_collision(event.pos):
-                        self.game_logic.restart()
+                        self.game_logic.start_fresh()
+                        self.playing = True
 
     def get_cell_color(self, cell_value: int):
         if cell_value == 0:
@@ -86,6 +93,11 @@ class Game2048Screen:
         self.restart_button.draw(self.screen)
 
         TextUI(f'Points: {self.game_logic.points}').draw(self.screen, (self.width - 150, 50), big_font)
+        TextUI(f'Moves: {self.game_logic.moves}').draw(self.screen, (self.width - 150, 80), big_font)
+
+        if not self.playing:
+            TextUI('No moves left!').draw(self.screen, (self.width / 2, 20), big_font)
+
 
         board_rect = pygame.Rect(0, 0, 400, 400)
         board_rect.center = (self.width // 2, self.height // 2)
@@ -122,4 +134,4 @@ class Game2048Screen:
                 pygame.draw.rect(self.screen, self.get_cell_color(value), new_rect, border_radius= 12)
 
                 if value > 0 and scale == 1.0:
-                    TextUI(str(value)).draw(self.screen, new_rect.center, regular_font, self.get_cell_value_color(value))
+                    TextUI(str(value)).draw(self.screen, new_rect.center, big_font, self.get_cell_value_color(value))
