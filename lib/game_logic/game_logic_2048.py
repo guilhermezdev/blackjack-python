@@ -43,7 +43,7 @@ class GameLogic2048:
             self.grid[position[0]][position[1]] = self.generate_value()
             return position
 
-    def process_values(self, values: list[int]):
+    def process_values(self, values: list[int], should_point = True):
         values = [value for value in values if value != 0]
 
         result = []
@@ -57,8 +57,9 @@ class GameLogic2048:
             if i + 1 < len(values) and values[i] == values[i + 1]:
                 merged_value = values[i] * 2
                 result.append(merged_value)
-                self.points += merged_value
-                skip = True  # skip next value since it was merged
+                if should_point:
+                    self.points += merged_value
+                skip = True
             else:
                 result.append(values[i])
 
@@ -72,12 +73,12 @@ class GameLogic2048:
     
     def can_move_left(self):
         for row in self.grid:
-            processed_row = self.process_values(row)
+            processed_row = self.process_values(row, should_point=False)
             if row != processed_row:
                 return True
         return False
     
-    def move_left(self):
+    def move_left(self) -> bool:
         new_grid = []
         changed = False
 
@@ -93,15 +94,17 @@ class GameLogic2048:
         if not self.no_moves_left:
             self.no_moves_left = not self.has_available_move()
 
+        return changed
+
     def can_move_right(self):
         for row in self.grid:
             inverted_row = row[::-1]
-            processed_row = self.process_values(inverted_row)[::-1]
+            processed_row = self.process_values(inverted_row, should_point=False)[::-1]
             if row != processed_row:
                 return True
         return False
 
-    def move_right(self):
+    def move_right(self) -> bool:
         new_grid = []
         changed = False
 
@@ -119,15 +122,17 @@ class GameLogic2048:
         if not self.no_moves_left:
             self.no_moves_left = not self.has_available_move()
 
+        return changed
+
     def can_move_up(self):
         for i in range(self.grid_size):
             row = [self.grid[j][i] for j in range(self.grid_size)]
-            processed_row = self.process_values(row)
+            processed_row = self.process_values(row, should_point=False)
             if row != processed_row:
                 return True
         return False
 
-    def move_up(self):
+    def move_up(self) -> bool:
         new_grid = [[0 for _ in range(self.grid_size)] for _ in range(self.grid_size)]
         changed = False
 
@@ -147,17 +152,20 @@ class GameLogic2048:
         
         if not self.no_moves_left:
             self.no_moves_left = not self.has_available_move()
+
+        return changed
+
     
     def can_move_down(self):
         for i in range(self.grid_size):
             row = [self.grid[j][i] for j in range(self.grid_size)]
             inverted_row = row[::-1]
-            processed_row = self.process_values(inverted_row)[::-1]
+            processed_row = self.process_values(inverted_row, should_point=False)[::-1]
             if row != processed_row:
                 return True
         return False
 
-    def move_down(self):
+    def move_down(self) -> bool:
         new_grid = [[0 for _ in range(self.grid_size)] for _ in range(self.grid_size)]
         changed = False
 
@@ -178,3 +186,5 @@ class GameLogic2048:
 
         if not self.no_moves_left:
             self.no_moves_left = not self.has_available_move()
+
+        return changed

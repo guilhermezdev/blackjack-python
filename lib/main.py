@@ -40,5 +40,9 @@ class Game:
         
             self.game_states[self.game_state_manager.get_state()].run()
 
-game = Game()
-game.run()
+def main():
+    game = Game()
+    game.run()
+
+if __name__ == "__main__":
+    main()

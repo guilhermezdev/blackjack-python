@@ -21,7 +21,8 @@ class Game2048Screen:
 
         self.game_logic = GameLogic2048(4)
 
-        self.restart_button = ButtonUI(100, 40, 140, 50, 'Restart')
+        self.back_button = ButtonUI(100, 40, 140, 50, 'Back')
+        self.restart_button = ButtonUI(self.width - 150, self.height - 100, 140, 50, 'Restart')
 
         self.animation = None
 
@@ -38,35 +39,46 @@ class Game2048Screen:
                sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:
-                    self.game_state_manager.set_state('main_menu')
+                    self.go_back()
                 elif self.playing and event.key == K_LEFT:
-                    self.game_logic.move_left()
-                    new_position = self.game_logic.insert_at_random_empty_space()
-                    self.animation = (new_position, 200, pygame.time.get_ticks())
+                    moved = self.game_logic.move_left()
+                    if moved:
+                        new_position = self.game_logic.insert_at_random_empty_space()
+                        self.animation = (new_position, 200, pygame.time.get_ticks())
                     self.playing = not self.game_logic.no_moves_left
 
                 elif self.playing and event.key == K_RIGHT:
-                    self.game_logic.move_right()
-                    new_position = self.game_logic.insert_at_random_empty_space()
-                    self.animation = (new_position, 200, pygame.time.get_ticks())
+                    moved = self.game_logic.move_right()
+                    if moved:
+                        new_position = self.game_logic.insert_at_random_empty_space()
+                        self.animation = (new_position, 200, pygame.time.get_ticks())
                     self.playing = not self.game_logic.no_moves_left
 
                 elif self.playing and event.key == K_UP:
-                    self.game_logic.move_up()
-                    new_position = self.game_logic.insert_at_random_empty_space()
-                    self.animation = (new_position, 200, pygame.time.get_ticks())
+                    moved = self.game_logic.move_up()
+                    if moved:
+                        new_position = self.game_logic.insert_at_random_empty_space()
+                        self.animation = (new_position, 200, pygame.time.get_ticks())
                     self.playing = not self.game_logic.no_moves_left
 
                 elif self.playing and event.key == K_DOWN:
-                    self.game_logic.move_down()
-                    new_position = self.game_logic.insert_at_random_empty_space()
-                    self.animation = (new_position, 200, pygame.time.get_ticks())
+                    moved = self.game_logic.move_down()
+                    if moved:
+                        new_position = self.game_logic.insert_at_random_empty_space()
+                        self.animation = (new_position, 200, pygame.time.get_ticks())
                     self.playing = not self.game_logic.no_moves_left
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.restart_button.check_collision(event.pos):
                         self.game_logic.start_fresh()
                         self.playing = True
+                    elif self.back_button.check_collision(event.pos):
+                        self.go_back()
+
+    def go_back(self):
+        self.game_logic.start_fresh()
+        self.playing = True
+        self.game_state_manager.set_state('main_menu')
 
     def get_cell_color(self, cell_value: int):
         if cell_value == 0:
@@ -91,6 +103,7 @@ class Game2048Screen:
         self.screen.fill(WHITE)
 
         self.restart_button.draw(self.screen)
+        self.back_button.draw(self.screen)
 
         TextUI(f'Points: {self.game_logic.points}').draw(self.screen, (self.width - 150, 50), big_font)
         TextUI(f'Moves: {self.game_logic.moves}').draw(self.screen, (self.width - 150, 80), big_font)

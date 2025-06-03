@@ -5,7 +5,9 @@ a = Analysis(
     ['lib\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        ('C:\\Gui\\Playground\\pycade\\assets', 'assets')
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

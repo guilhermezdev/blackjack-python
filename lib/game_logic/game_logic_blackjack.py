@@ -69,8 +69,11 @@ class Hand():
 class BlackJackGame():
     def __init__(self, initial_money: int):
         self.money = initial_money
+        self.start_fresh()
+
+    def start_fresh(self):
         self.bet = 0
-        self.deck = Deck(shuffled= True)
+        self.deck = Deck(shuffled= True)      
 
     def start_round(self, bet: int):
         self.bet = bet
